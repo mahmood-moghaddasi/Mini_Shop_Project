@@ -4,12 +4,20 @@ import styles from "./ProductsPage.module.css";
 import Card from "../components/Card";
 import Loader from "../components/Loader";
 import { ImSearch } from "react-icons/im";
+import { FaListUl } from "react-icons/fa";
 function ProductsPage() {
   const products = useProducts();
 
   const [search, setSearch] = useState("");
   const searchHandler = () => {
     console.log("search");
+  };
+  const categoryHandler = (event) => {
+    const { tagName } = event.target;
+    const category = event.target.innerText.toLowerCase();
+
+    if (tagName !== "LI") return;
+    console.log(category);
   };
   return (
     <>
@@ -31,7 +39,19 @@ function ProductsPage() {
             <Card key={product.id} data={product} />
           ))}
         </div>
-        <div>sidebar</div>
+        <div>
+          <div>
+            <FaListUl />
+            <p>Categories</p>
+          </div>
+          <ul onClick={categoryHandler}>
+            <li>All</li>
+            <li>Electeronics</li>
+            <li>Jewelery</li>
+            <li>Men's Clothing</li>
+            <li>Wommen's Clothing</li>
+          </ul>
+        </div>
       </div>
     </>
   );
