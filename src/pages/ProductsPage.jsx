@@ -1,6 +1,7 @@
 import React from "react";
 import { useProducts } from "../context/ProductProvider";
 import styles from "./ProductsPage.module.css";
+import Card from "../components/Card";
 function ProductsPage() {
   const products = useProducts();
   console.log(products);
@@ -9,7 +10,7 @@ function ProductsPage() {
       <div className={styles.products}>
         {!products.length && <p>loading</p>}
         {products.map((product) => (
-          <p>{product.title}</p>
+          <Card key={product.id} data={product} />
         ))}
       </div>
       <div>sidebar</div>
