@@ -1,57 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useProducts } from "../context/ProductProvider";
 import styles from "./ProductsPage.module.css";
 import Card from "../components/Card";
 import Loader from "../components/Loader";
-import { ImSearch } from "react-icons/im";
-import { FaListUl } from "react-icons/fa";
+
+import {
+  searchProducts,
+  filterProducts,
+  getInitialQuery,
+} from "../helper/helper";
+import { useSearchParams } from "react-router-dom";
+import SearchBox from "../components/SearchBox";
+import SideBar from "../components/SideBar";
 function ProductsPage() {
   const products = useProducts();
 
-  const [search, setSearch] = useState("");
-  const searchHandler = () => {
-    console.log("search");
-  };
-  const categoryHandler = (event) => {
-    const { tagName } = event.target;
-    const category = event.target.innerText.toLowerCase();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-    if (tagName !== "LI") return;
-    console.log(category);
-  };
+  const [displayed, setDisplayed] = useState([]);
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState({});
+
+  useEffect(() => {
+    setDisplayed(products);
+    setQuery(getInitialQuery(searchParams));
+  }, [products]);
+
+  useEffect(() => {
+    setSearchParams(query);
+    setSearch(query.search || "");
+    let finalProducts = searchProducts(products, query.search);
+    finalProducts = filterProducts(finalProducts, query.category);
+    setDisplayed(finalProducts);
+  }, [query]);
   return (
     <>
-      <div>
-        <input
-          type="text"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value.toLowerCase().trim())}
-        />
-        <button onClick={searchHandler}>
-          <ImSearch />
-        </button>
-      </div>
+      <SearchBox search={search} setSearch={setSearch} setQuery={setQuery} />
       <div className={styles.container}>
         <div className={styles.products}>
-          {!products.length && <Loader />}
-          {products.map((product) => (
+          {!displayed.length && <Loader />}
+          {displayed.map((product) => (
             <Card key={product.id} data={product} />
           ))}
         </div>
-        <div>
-          <div>
-            <FaListUl />
-            <p>Categories</p>
-          </div>
-          <ul onClick={categoryHandler}>
-            <li>All</li>
-            <li>Electeronics</li>
-            <li>Jewelery</li>
-            <li>Men's Clothing</li>
-            <li>Wommen's Clothing</li>
-          </ul>
-        </div>
+        <SideBar setQuery={setQuery} />
       </div>
     </>
   );
